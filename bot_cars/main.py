@@ -1,5 +1,6 @@
 import bot_telegram
 
+# Запуск приложения
 def main():
   print("Старт приложения")
   bot_telegram

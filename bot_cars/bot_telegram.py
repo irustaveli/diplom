@@ -10,7 +10,6 @@ config.read("bot.ini")  # создаем файл, записываем в не�
 token = config["Bot"]["token"]
 
 bot = telebot.TeleBot(token)
-crossIcon = u"\u274C"
 message_text = ""
 notes=[]
 chat_id = ""
@@ -24,16 +23,14 @@ def button_message(message):
     markup.add(item1,item2,item3)
     bot.send_message(message.chat.id, 'Привет, я чат-бот по подбору автомобилей', reply_markup=markup)
 
+# Получаем список автомобилей и выводим названия кнопок
 def makeKeyboard(stringList):
     markup = types.InlineKeyboardMarkup()
 
     for value in stringList:
-        # markup.add(types.InlineKeyboardButton(text=value,
-        #                                       callback_data="['value', '" + value + "', '" + key + "']"))
+
         markup.add(types.InlineKeyboardButton(text=value,
                                                callback_data="['value', '" + value + "']"))
-        # types.InlineKeyboardButton(text=crossIcon,
-        #                            callback_data="['key', '" + key + "']"))
 
     return markup
 
@@ -45,6 +42,7 @@ def makeKeyboard1(stringList):
                                                callback_data="['info', '" + value + "']"))
     return markup
 
+# Выводим меню в боте
 @bot.message_handler(content_types=['text'])
 def handle_command_adminwindow(message):
     global message_text
@@ -58,7 +56,7 @@ def handle_command_adminwindow(message):
                         reply_markup=makeKeyboard(stringList),
                         parse_mode='HTML')
     
-
+# Выводим список марок автомобилей
 @bot.callback_query_handler(func=lambda call: True)
 def handle_command_adminwindow(call):
     if (call.data.startswith("['value'")):
@@ -132,7 +130,7 @@ def handle_command_adminwindow(call):
                 bot.answer_callback_query(callback_query_id=call.id,
                                         show_alert=True,
                                         text="Произошла ошибка, попробуйте повторить позже")
-
+# Записываемся на тест-драйв
 @bot.message_handler(content_types=["text"])
 def text_fio(message):
     if message_text == 'Записаться на тест-драйв':
@@ -170,19 +168,21 @@ def handle_command_send(call):
         bot.answer_callback_query(chat_id,
                                     show_alert=True,
                                     text="Вы успешно записались на тест-драйв")
-
+# Подтверждаем запись на тест-драйв в бд 
 def button_testdrive_message():
     markup = types.InlineKeyboardMarkup()
     switch_button = types.InlineKeyboardButton(text='Отправить информацию?', callback_data="['test_drive', 'Отправить информацию?']")
     markup.add(switch_button)
     return markup
 
+# Подтверждаем запись бронирования в бд 
 def button_booking_message():
     markup = types.InlineKeyboardMarkup()
     switch_button = types.InlineKeyboardButton(text='Отправить информацию?', callback_data="['booking', 'Отправить информацию?']")
     markup.add(switch_button)
     return markup    
 
+# Включаем постоянно бот
 while True:
     try:
         print("Бот успешно запущен")

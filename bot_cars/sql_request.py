@@ -1,17 +1,13 @@
 
 import sqlite3
 
+# Получаем список автомобилей
 def cars_name():
     row_cars = []
     try:
         sqlite_connection = sqlite3.connect('sqlite.db')
         cursor = sqlite_connection.cursor()
         print("База данных подключена к SQLite")
-
-        # with open('namecars.sql', 'r') as sqlite_file:
-        #     sql_script = sqlite_file.read()
-
-        # cursor.executescript(sql_script)
         for row in cursor.execute("SELECT name FROM cars_name"):
             row_cars.append(row[0])
         print("Скрипт SQLite успешно выполнен")
@@ -24,6 +20,7 @@ def cars_name():
             print("Соединение с SQLite закрыто")
     return row_cars
 
+# Получаем список марок автомобилей
 def cars_models(model_name):
     row_models = []
     try:
@@ -42,7 +39,7 @@ def cars_models(model_name):
             sqlite_connection.close()
             print("Соединение с SQLite закрыто")
     return row_models
-
+# Получаем информацию по выброному автомобилю
 def cars_info(model_info):
     row_info = []
     try:
@@ -62,6 +59,7 @@ def cars_info(model_info):
             print("Соединение с SQLite закрыто")
     return row_info
 
+# Запись на тест-драйв  
 def test_drive(model_name):
     try:
         sqlite_connection = sqlite3.connect('sqlite.db')
@@ -80,6 +78,7 @@ def test_drive(model_name):
             print("Соединение с SQLite закрыто")
     return 1
 
+# Запись бронирования автомобиля
 def booking(model_name):
     try:
         sqlite_connection = sqlite3.connect('sqlite.db')
