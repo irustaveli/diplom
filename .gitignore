@@ -20,6 +20,7 @@ bot.ini
 mono_crash.*
 
 # Build results
+/Manager_cars/Manager_cars/obj
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
