@@ -1,11 +1,13 @@
 
 import sqlite3
+import os
 
 # Получаем список автомобилей
 def cars_name():
     row_cars = []
     try:
-        sqlite_connection = sqlite3.connect('sqlite.db')
+        path = '/'.join((os.path.abspath(__file__).replace('\\', '/')).split('/')[:-1])
+        sqlite_connection = sqlite3.connect(os.path.join(path,'cars_manager.db'))
         cursor = sqlite_connection.cursor()
         print("База данных подключена к SQLite")
         for row in cursor.execute("SELECT name FROM cars_name"):
@@ -24,7 +26,8 @@ def cars_name():
 def cars_models(model_name):
     row_models = []
     try:
-        sqlite_connection = sqlite3.connect('sqlite.db')
+        path = '/'.join((os.path.abspath(__file__).replace('\\', '/')).split('/')[:-1])
+        sqlite_connection = sqlite3.connect(os.path.join(path,'cars_manager.db'))
         cursor = sqlite_connection.cursor()
         print("База данных подключена к SQLite")
 
@@ -43,12 +46,13 @@ def cars_models(model_name):
 def cars_info(model_info):
     row_info = []
     try:
-        sqlite_connection = sqlite3.connect('sqlite.db')
+        path = '/'.join((os.path.abspath(__file__).replace('\\', '/')).split('/')[:-1])
+        sqlite_connection = sqlite3.connect(os.path.join(path,'cars_manager.db'))
         cursor = sqlite_connection.cursor()
         print("База данных подключена к SQLite")
 
-        for row in cursor.execute(f"select i1.info, i1.price from cars_models a join cars_info i1 on i1.id_models=a.id where a.models='{model_info}';"):
-            row_info.append((row[0], row[1]))
+        for row in cursor.execute(f"select i1.info, i1.price, i1.ImageData from cars_models a join cars_info i1 on i1.id_models=a.id where a.models='{model_info}';"):
+            row_info.append((row[0], row[1], row[2]))
         print("Скрипт SQLite успешно выполнен")
         cursor.close()
     except sqlite3.Error as error:
@@ -62,7 +66,8 @@ def cars_info(model_info):
 # Запись на тест-драйв  
 def test_drive(model_name):
     try:
-        sqlite_connection = sqlite3.connect('sqlite.db')
+        path = '/'.join((os.path.abspath(__file__).replace('\\', '/')).split('/')[:-1])
+        sqlite_connection = sqlite3.connect(os.path.join(path,'cars_manager.db'))
         cursor = sqlite_connection.cursor()
         print("База данных подключена к SQLite")
         print(model_name[1])
@@ -81,7 +86,8 @@ def test_drive(model_name):
 # Запись бронирования автомобиля
 def booking(model_name):
     try:
-        sqlite_connection = sqlite3.connect('sqlite.db')
+        path = '/'.join((os.path.abspath(__file__).replace('\\', '/')).split('/')[:-1])
+        sqlite_connection = sqlite3.connect(os.path.join(path,'cars_manager.db'))
         cursor = sqlite_connection.cursor()
         print("База данных подключена к SQLite")
         print(model_name[1])

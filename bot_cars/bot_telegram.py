@@ -4,10 +4,15 @@ import time
 from telebot import types
 import sql_request
 import configparser
+import os
+import io
+import PIL.Image as Image
 
+ 
 config = configparser.ConfigParser()  # создаём объекта парсера
-config.read("bot.ini")  # создаем файл, записываем в него токен и читаем конфиг
-token = config["Bot"]["token"]
+path = '/'.join((os.path.abspath(__file__).replace('\\', '/')).split('/')[:-1])
+config.read(os.path.join(path, "bot.ini")) # создаем файл, записываем в него токен и читаем конфиг  
+token = config["Test"]["token"]
 
 bot = telebot.TeleBot(token)
 message_text = ""
@@ -17,9 +22,9 @@ chat_id = ""
 @bot.message_handler(commands=['start'])
 def button_message(message):
     markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-    item1=types.KeyboardButton("Информация об автомобили")
-    item2=types.KeyboardButton("Записаться на тест-драйв")
-    item3=types.KeyboardButton("Забронировать автомобиль")
+    item1=types.KeyboardButton("\U0001F697Информация об автомобили")
+    item2=types.KeyboardButton("\U0001F4DDЗаписаться на тест-драйв")
+    item3=types.KeyboardButton("\U0001F510\U0001F510Забронировать автомобиль")
     markup.add(item1,item2,item3)
     bot.send_message(message.chat.id, 'Привет, я чат-бот по подбору автомобилей', reply_markup=markup)
 
@@ -49,7 +54,7 @@ def handle_command_adminwindow(message):
     global chat_id
     message_text = message.text
     chat_id=message.chat.id
-    if (message_text == 'Информация об автомобили') or (message_text == 'Записаться на тест-драйв') or (message_text == 'Забронировать автомобиль'):
+    if (message_text == '\U0001F697Информация об автомобили') or (message_text == '\U0001F4DDЗаписаться на тест-драйв') or (message_text == '\U0001F510Забронировать автомобиль'):
         stringList = sql_request.cars_name()
         bot.send_message(chat_id,
                         text="Выберите марку автомобиля:",
@@ -78,17 +83,20 @@ def handle_command_adminwindow(call):
                               reply_markup=makeKeyboard(),
                               parse_mode='HTML')
     
-    if message_text == 'Информация об автомобили':
+    if message_text == '\U0001F697Информация об автомобили':
         if (call.data.startswith("['info'")):
             print(f"call.data : {call.data} , type : {type(call.data)}")
             print(f"ast.literal_eval(call.data) : {ast.literal_eval(call.data)} , type : {type(ast.literal_eval(call.data))}")
             valueFromCallBack = ast.literal_eval(call.data)[1]
             stringList = sql_request.cars_info(valueFromCallBack)
+            # Получаем картинку из БД
+            image = Image.open(io.BytesIO(stringList[0][2]))
             bot.send_message(chat_id, 
                             text=f"Цена {valueFromCallBack} *{stringList[0][1]} RUB*\n*Информация по автомобилю:*\n{stringList[0][0]}",
                             parse_mode= "Markdown")
+            bot.send_photo(chat_id, image)
     
-    elif message_text == 'Записаться на тест-драйв':
+    elif message_text == '\U0001F4DDЗаписаться на тест-драйв':
         if (call.data.startswith("['info'")):
             print(f"call.data : {call.data} , type : {type(call.data)}")
             print(f"ast.literal_eval(call.data) : {ast.literal_eval(call.data)} , type : {type(ast.literal_eval(call.data))}")
@@ -109,7 +117,7 @@ def handle_command_adminwindow(call):
                 bot.answer_callback_query(callback_query_id=call.id,
                                         show_alert=True,
                                         text="Произошла ошибка, попробуйте повторить позже")
-    elif message_text == 'Забронировать автомобиль':
+    elif message_text == '\U0001F510Забронировать автомобиль':
         if (call.data.startswith("['info'")):
             print(f"call.data : {call.data} , type : {type(call.data)}")
             print(f"ast.literal_eval(call.data) : {ast.literal_eval(call.data)} , type : {type(ast.literal_eval(call.data))}")
@@ -133,21 +141,21 @@ def handle_command_adminwindow(call):
 # Записываемся на тест-драйв
 @bot.message_handler(content_types=["text"])
 def text_fio(message):
-    if message_text == 'Записаться на тест-драйв':
+    if message_text == '\U0001F4DDЗаписаться на тест-драйв':
         notes.append(message.text)
         t1 = bot.send_message(message.chat.id, "Дата записи (формат mm/dd/yy, например 05/21/23)")
         bot.register_next_step_handler(t1, text_date)
-    elif message_text == 'Забронировать автомобиль':
+    elif message_text == '\U0001F510Забронировать автомобиль':
         notes.append(message.text)
         t1 = bot.send_message(message.chat.id, "Введите номер телефона для обратной связи")
         bot.register_next_step_handler(t1, text_date)
 @bot.message_handler(content_types=["text"])
 def text_date(message):
-    if message_text == 'Записаться на тест-драйв':
+    if message_text == '\U0001F4DDЗаписаться на тест-драйв':
         notes.append(message.text)
         t1 = bot.send_message(message.chat.id, "Введите номер телефона для обратной связи")
         bot.register_next_step_handler(t1, text_tel)
-    elif message_text == 'Забронировать автомобиль':
+    elif message_text == '\U0001F510Забронировать автомобиль':
         notes.append(message.text)
         t1 = bot.send_message(message.chat.id, 
                         f"ФИО клиента: {notes[1]}, Автомобиль: {notes[0]}, Номер для обратной связи: {notes[2]}", 
